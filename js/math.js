@@ -94,8 +94,8 @@ const Mapping = (z) => {
 
     // return Complex.add(z, new Complex(1,1));
 
-    // if( z.isInfinity() ) return Complex.div(a,c);
-    return Complex.exp(Complex.div(z,new Complex(3)));
+    if( z.isInfinity() ) return Complex.div(a,c);
+    // return Complex.exp(Complex.div(z,new Complex(3)));
 
-    // return Complex.div(Complex.add(Complex.mult(a, z), b), Complex.add(Complex.mult(c, z), d) ); // (az+b)/(cz+d)
+    return Complex.div(Complex.add(Complex.mult(a, z), b), Complex.add(Complex.mult(c, z), d) ); // (az+b)/(cz+d)
 }

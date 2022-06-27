@@ -79,19 +79,19 @@
                 const ss = 100;
 
                 // Mobius funcs
-                // for (let i = ss; i >= -ss; i--) {
-                //     pos.push(- 1 * 2 ** (i / ss * 10))
-                // }
-                // for (let i = -ss; i < ss; i++) {
-                //     pos.push(2 ** (i / ss * 10))
-                // }
-
-                for(let i = -3; i <= 3; i += 0.05) {
-                    pos.push(i);
+                for (let i = ss; i >= -ss; i--) {
+                    pos.push(- 1 * 2 ** (i / ss * 10))
+                }
+                for (let i = -ss; i < ss; i++) {
+                    pos.push(2 ** (i / ss * 10))
                 }
 
+                // for(let i = -3; i <= 3; i += 0.05) {
+                //     pos.push(i);
+                // }
+
                 const c1 = 1;
-                const c2 = 0.5;
+                const c2 = 1;
                 // console.log(pos);
 
                 for (let y = (((0.5-c1)*h) - ((0.5-c1) * h) % ppb + h/2 % ppb);  y <= h * (c1+0.5); y += ppb) {
