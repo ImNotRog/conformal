@@ -50,6 +50,18 @@
                 for(let y = h/2 % ppb; y <= h; y += ppb) {
                     let horizontal = new Path({ segments: [[0, y], [w, y]] });
                     horizontal.strokeColor = '#fff'; horizontal.strokeWidth = 0.5
+
+                    if(y===h/2) continue;
+                    let marker = new PointText(new Point(w/2 - 10, y+10));
+                    marker.content = `${(-y+h/2)/ppb}i`;
+
+                    marker.style = {
+                        fontFamily: 'Courier New',
+                        fontSize: 30,
+                        fillColor: '#ffffff90',
+                        justification: 'right',
+                        align: 'center'
+                    };
                 }
 
                 let re = new Path({ segments: [[0, h/2], [w, h/2]] });
@@ -60,7 +72,19 @@
 
                 for (let x = w / 2 % ppb; x <= w; x+= ppb) {
                     let horizontal = new Path({ segments: [[x, 0], [x, h]] });
-                    horizontal.strokeColor = '#fff'; horizontal.strokeWidth = 0.5
+                    horizontal.strokeColor = '#fff'; horizontal.strokeWidth = 0.5;
+
+                    if(x === w/2) continue;
+                    let marker = new PointText(new Point(x+10, h/2-10));
+                    marker.content = `${(x - w / 2) / ppb}`;
+
+                    marker.style = {
+                        fontFamily: 'Courier New',
+                        fontSize: 30,
+                        fillColor: '#ffffff90',
+                        justification: 'right',
+                        align: 'center'
+                    };
                 }
 
                 let im = new Path({ segments: [[ w / 2, 0], [w/2, h]] });
@@ -76,26 +100,24 @@
 
                 const pos = [];
 
-                const ss = 100;
-
                 // Mobius funcs
-                for (let i = ss; i >= -ss; i--) {
-                    pos.push(- 1 * 2 ** (i / ss * 10))
+                for (let i = 100; i >= -100; i--) {
+                    pos.push(- 1 * 2 ** (i / 10))
                 }
-                for (let i = -ss; i < ss; i++) {
-                    pos.push(2 ** (i / ss * 10))
+                for (let i = -100; i < 100; i++) {
+                    pos.push(2 ** (i / 10))
                 }
 
                 // for(let i = -3; i <= 3; i += 0.05) {
                 //     pos.push(i);
                 // }
 
-                const c1 = 1;
-                const c2 = 1;
+                const c1 = 1.5; // yellow
+                const c2 = 1.5; // blue
                 const animDuration = 200;
                 // console.log(pos);
 
-                for (let y = (((0.5-c1)*h) - ((0.5-c1) * h) % ppb + h/2 % ppb);  y <= h * (c1+0.5); y += ppb) {
+                for (let y = (((0.5-c1)*h) - ((0.5-c1) * h) % ppb + h/2 % ppb) - ppb;  y <= h * (c1+0.5); y += ppb) {
 
                     let path = new Path();
                     const points = [];
@@ -123,7 +145,7 @@
                     })
                 }
 
-                for (let x = (((0.5-c2) * w) - ((0.5-c2) * w) % ppb + w / 2 % ppb); x <= w * (0.5+c2); x += ppb) {
+                for (let x = (((0.5-c2) * w) - ((0.5-c2) * w) % ppb + w / 2 % ppb) - ppb; x <= w * (0.5+c2); x += ppb) {
 
                     let path = new Path();
                     const points = [];
@@ -155,7 +177,8 @@
                     if (e.count % 2 !== 0) return;
                     if(e.count > animDuration) return;
 
-                    const frame = rmap(e.count, 0, animDuration, 0, 1);
+                    const t = rmap(e.count, 0, animDuration, 0, 1);
+                    const frame = t ** 2 * ((t-2) ** 2);
 
                     // Horizontal Grid
 
