@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobius Transforms</title>
+
+    <script type="text/javascript" src="js/paper.js"></script>
+
+    <style>
+        body, html {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <script type="text/javascript" src="js/math.js"></script>
+    <script>
+
+        window.onload = function () {
+            // Get a reference to the canvas object
+            var canvas = document.getElementById('canvas');
+            // Create an empty project and a view for the canvas:
+            paper.setup(canvas);
+
+            with (paper) {
+                
+                let bg = new Path();
+                
+                bg.set(new Path.Rectangle(view.bounds));
+                bg.fillColor = '#000000';
+                bg.sendToBack();
+
+                const w = view.bounds.width;
+                const h = view.bounds.height;
+
+                const ppb = 100; // pixels per box
+                const upb = 1; // units per box
+                
+                // Horizontal Grid
+
+                for(let y = h/2 % ppb; y <= h; y += ppb) {
+                    let horizontal = new Path({ segments: [[0, y], [w, y]] });
+                    horizontal.strokeColor = '#fff'; horizontal.strokeWidth = 0.5
+                }
+
+                let re = new Path({ segments: [[0, h/2], [w, h/2]] });
+                re.strokeColor = '#fff';
+                re.strokeWidth = 2;
+                
+                // Vertical Grid
+
+                for (let x = w / 2 % ppb; x <= w; x+= ppb) {
+                    let horizontal = new Path({ segments: [[x, 0], [x, h]] });
+                    horizontal.strokeColor = '#fff'; horizontal.strokeWidth = 0.5
+                }
+
+                let im = new Path({ segments: [[ w / 2, 0], [w/2, h]] });
+                im.strokeColor = '#fff';
+                im.strokeWidth = 2;
+
+                view.draw();
+
+                const rmap = (x, a,b, c,d) => (d-c) * (x-a)/(b-a) + c;
+
+                const horizontals = [];
+                const verticals = [];
+
+                const pos = [];
+
+                const ss = 100;
+
+                // Mobius funcs
+                // for (let i = ss; i >= -ss; i--) {
+                //     pos.push(- 1 * 2 ** (i / ss * 10))
+                // }
+                // for (let i = -ss; i < ss; i++) {
+                //     pos.push(2 ** (i / ss * 10))
+                // }
+
+                for(let i = -3; i <= 3; i += 0.05) {
+                    pos.push(i);
+                }
+
+                const c1 = 1;
+                const c2 = 0.5;
+                // console.log(pos);
+
+                for (let y = (((0.5-c1)*h) - ((0.5-c1) * h) % ppb + h/2 % ppb);  y <= h * (c1+0.5); y += ppb) {
+
+                    let path = new Path();
+                    const points = [];
+                    for (const xp of pos) {
+                        const x = rmap(xp, -1, 1, 0, w);
+                        const z = new Complex(rmap(x, 0, w, - w / 2 / ppb * upb, w / 2 / ppb * upb), rmap(y, 0, h, - h / 2 / ppb * upb, h / 2 / ppb * upb));
+                        // console.log(z.toString());
+                        const fz = Mapping(z);
+                        const fx = rmap(fz.r, - w / 2 / ppb * upb, w / 2 / ppb * upb, 0, w);
+                        const fy = rmap(fz.i, - h / 2 / ppb * upb, h / 2 / ppb * upb, 0, h);
+
+                        points.push({
+                            fx, fy, x, y
+                        })
+
+                        path.add(new Point(x,y));
+                    }
+
+                    path.smooth();
+                    path.strokeColor = '#ffff00';
+
+                    horizontals.push( {
+                        path,
+                        points
+                    })
+                }
+
+                for (let x = (((0.5-c2) * w) - ((0.5-c2) * w) % ppb + w / 2 % ppb); x <= w * (0.5+c2); x += ppb) {
+
+                    let path = new Path();
+                    const points = [];
+                    for (const yp of pos) {
+                        const y = rmap(yp, -2, 2, 0, w);
+                        const z = new Complex(rmap(x, 0, w, - w / 2 / ppb * upb, w / 2 / ppb * upb), rmap(y, 0, h, - h / 2 / ppb * upb, h / 2 / ppb * upb));
+                        // console.log(z.toString());
+                        const fz = Mapping(z);
+                        const fx = rmap(fz.r, - w / 2 / ppb * upb, w / 2 / ppb * upb, 0, w);
+                        const fy = rmap(fz.i, - h / 2 / ppb * upb, h / 2 / ppb * upb, 0, h);
+
+                        points.push({
+                            fx, fy, x, y
+                        })
+
+                        path.add(new Point(x, y));
+                    }
+
+                    path.smooth();
+                    path.strokeColor = '#00ffff';
+
+                    verticals.push({
+                        path,
+                        points
+                    })
+                }
+
+                const animDuration = 200;
+                view.onFrame = (e) => {
+                    if (e.count % 2 !== 0) return;
+                    if(e.count > animDuration) return;
+
+                    const frame = rmap(e.count, 0, animDuration, 0, 1);
+
+                    // Horizontal Grid
+
+                    for(const h of horizontals) {
+                        let path = new Path();
+
+                        for(const p of h.points) {
+                            const x = rmap(frame,0,1, p.x, p.fx);
+                            const y = rmap(frame, 0, 1, p.y, p.fy);
+                            path.add(new Point( x,y ));
+                        }
+
+                        path.strokeColor = '#ffff00';
+                        h.path.remove();
+                        h.path = path;
+                    }
+
+                    for (const v of verticals) {
+                        let path = new Path();
+
+                        for (const p of v.points) {
+                            const x = rmap(frame, 0, 1, p.x, p.fx);
+                            const y = rmap(frame, 0, 1, p.y, p.fy);
+                            path.add(new Point(x, y));
+                        }
+
+                        path.strokeColor = '#00ffff';
+                        v.path.remove();
+                        v.path = path;
+
+                        if(frame === 1) path.smooth();
+                    }
+
+                    
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <canvas id="canvas" resize></canvas>
+</body>
+</html>
