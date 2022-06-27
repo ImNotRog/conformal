@@ -92,6 +92,7 @@
 
                 const c1 = 1;
                 const c2 = 1;
+                const animDuration = 200;
                 // console.log(pos);
 
                 for (let y = (((0.5-c1)*h) - ((0.5-c1) * h) % ppb + h/2 % ppb);  y <= h * (c1+0.5); y += ppb) {
@@ -150,7 +151,6 @@
                     })
                 }
 
-                const animDuration = 200;
                 view.onFrame = (e) => {
                     if (e.count % 2 !== 0) return;
                     if(e.count > animDuration) return;

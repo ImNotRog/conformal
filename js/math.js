@@ -80,6 +80,14 @@ class Complex {
         return new Complex(Math.exp(a.r) * Math.cos(a.i), Math.exp(a.r) * Math.sin(a.i));
     }
 
+    static sin(a) {
+        return Complex.div( Complex.sub( Complex.exp(a), Complex.exp(Complex.neg(a)) ), new Complex(0,2) )
+    }
+
+    static cos(a) {
+        return Complex.div(Complex.add(Complex.exp(a), Complex.exp(Complex.neg(a))), new Complex(2))
+    }
+
     static div(a,b) {
         return Complex.mult(a, Complex.inv(b));
     }
@@ -87,15 +95,15 @@ class Complex {
 
 const Mapping = (z) => {
     // Mobius Transform
-    const a = new Complex(1);
+    const a = new Complex(0);
     const b = new Complex(10);
-    const c = new Complex(1,2);
-    const d = new Complex(1);
+    const c = new Complex(1);
+    const d = new Complex(0);
 
     // return Complex.add(z, new Complex(1,1));
 
     if( z.isInfinity() ) return Complex.div(a,c);
-    // return Complex.exp(Complex.div(z,new Complex(3)));
+    // return Complex.sin(Complex.div(z, new Complex(6)));
 
     return Complex.div(Complex.add(Complex.mult(a, z), b), Complex.add(Complex.mult(c, z), d) ); // (az+b)/(cz+d)
 }
